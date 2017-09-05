@@ -69,6 +69,12 @@ void planeWorld::run()
 			}
 			else if (eve.type == sf::Event::MouseButtonPressed && eve.mouseButton.button == sf::Mouse::Left)
 			{
+				particleSwarm->setForceActive(true);
+				break;
+			}
+			else if (eve.type == sf::Event::MouseButtonReleased && eve.mouseButton.button == sf::Mouse::Left)
+			{
+				particleSwarm->setForceActive(false);
 				break;
 			}
 			else if (eve.type == sf::Event::MouseButtonPressed && eve.mouseButton.button == sf::Mouse::Right)

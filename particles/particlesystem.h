@@ -29,6 +29,7 @@ public:
 	void drawWithShape(sf::RenderWindow* window, sf::CircleShape& shape);
 	void setRandomPositions(RNGesus* rng, const vec2& limits);
 	void update(float dt);
+	void setForceActive(bool b);
 
 private:
 

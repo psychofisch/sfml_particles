@@ -2,7 +2,7 @@
 
 ParticleSystem::ParticleSystem(size_t numOfParticles)
 	:m_vertices(sf::Points, numOfParticles),
-	m_force(0, 0, false, 0.f),
+	m_force(0, 0, false, 1.f),
 	m_particleSpeed(1.f),
 	m_numberOfParticles(numOfParticles),
 	m_maxSpeed(500.f)
@@ -55,12 +55,27 @@ void ParticleSystem::update(float dt)
 
 		//std::cout << vectorMath::angleD(vectorMath::normalize(newVel) - vectorMath::normalize(m_velocity[i])) << std::endl;
 		//std::cout << vectorMath::radToDeg(atan2f(newVel.y - m_velocity[i].y, newVel.x - m_velocity[i].x)) << std::endl;
-		//m_velocity[i] = vectorMath::normalize(newVel) * m_maxSpeed;
+		
+		if (m_force.isActive)
+		{
+			float forceFactor = 1.f - (vectorMath::magnitude(m_position[i] - m_force) / 200.f);
+			forceFactor = std::max(0.f, std::min(1.f, forceFactor));
+			m_velocity[i] += forceFactor * (m_force - m_position[i]) * dt * 50.f;
+		}
 
+		m_velocity[i] -= dt * m_velocity[i] * 0.5f;//damping
 		m_position[i] += m_velocity[i] * dt;
 
 		m_vertices[i].position = m_position[i];
+
+		float colorFac = std::max(0.f, 1.0f - vectorMath::magnitude(m_velocity[i]) / 500.f);
+		m_vertices[i].color.r = static_cast<uint8_t>(colorFac * 255);
 	}
+}
+
+void ParticleSystem::setForceActive(bool b)
+{
+	m_force.isActive = b;
 }
 
 void ParticleSystem::draw(sf::RenderTarget & target, sf::RenderStates states) const
