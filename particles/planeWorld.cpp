@@ -132,14 +132,6 @@ void planeWorld::run()
 					break;
 				case sf::Keyboard::T:
 					break;
-				case sf::Keyboard::Num1:
-					if(m_numberOfThreads > 1)
-						m_numberOfThreads--;
-					break;
-				case sf::Keyboard::Num2:
-					if (m_numberOfThreads < omp_get_max_threads())
-						m_numberOfThreads++;
-					break;
 				case sf::Keyboard::Escape:
 					quit = true;
 					break;
@@ -177,7 +169,7 @@ void planeWorld::run()
 		//*** controls
 
 		//updates
-		particleSwarm->setAttractor(mousePos_mapped);
+		particleSwarm->setForcePosition(mousePos_mapped);
 		particleSwarm->update(dt);
 
 		++fpsCount;
@@ -196,7 +188,8 @@ void planeWorld::run()
 
 		m_window->setView(m_view);
 
-		particleSwarm->drawWithShape(m_window, particle);
+		m_window->draw(*particleSwarm);
+		//particleSwarm->drawWithShape(m_window, particle);
 
 		// debug text
 		m_window->setView(m_window->getDefaultView());
@@ -207,7 +200,6 @@ void planeWorld::run()
 		debugString << static_cast<int>(mousePos_mapped.x) << ":" << static_cast<int>(mousePos_mapped.y) << std::endl;
 		debugString << "VSYNC O" << ((m_vsync) ? "N" : "FF") << std::endl;
 		debugString << "Particles: " << numberOfParticles << std::endl;
-
 		debug_text.setString(debugString.str());
 
 		m_window->draw(debug_text);
@@ -243,11 +235,6 @@ bool planeWorld::setWorldDimensions(int size_x, int size_y)
 
 void planeWorld::updateSwarm()
 {
-}
-
-void planeWorld::setNumberOfThreads(unsigned int t)
-{
-	m_numberOfThreads = t;
 }
 
 void planeWorld::setDebugMode(bool d)

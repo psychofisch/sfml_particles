@@ -9,7 +9,7 @@
 
 void main(int argc, char* argv[])
 {
-	unsigned int threads = 1;
+	unsigned int threads = 4;
 	bool debug = false;
 
 	for (int i = 1; i < argc; ++i)
@@ -43,7 +43,6 @@ void main(int argc, char* argv[])
 
 	pw.setRenderWindow(&window);
 	pw.setWorldDimensions(1000, 1000);
-	pw.setNumberOfThreads(threads);
 	pw.setDebugMode(debug);
 	pw.run();
 }

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <omp.h>
 #include <fstream>
+#include <omp.h>
 
 #include <SFML\Graphics.hpp>
 
@@ -23,7 +24,6 @@ public:
 	bool setWorldDimensions(int size); //true = ERROR; false = successful
 	bool setWorldDimensions(int size_x, int size_y);
 	void updateSwarm();
-	void setNumberOfThreads(unsigned int t);
 	void setDebugMode(bool d);
 
 private:
@@ -32,6 +32,5 @@ private:
 	sf::View m_view;
 	bool m_vsync;
 	RNGesus* m_rng;
-	int m_numberOfThreads;
 	bool m_debug;
 };
