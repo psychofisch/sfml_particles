@@ -50,6 +50,10 @@ void ParticleSystem::update(float dt)
 	const sf::Color colorA = sf::Color::Yellow;
 	const sf::Color colorB = sf::Color::Red;
 
+	//optimization
+	maxSpeed = 1.f / maxSpeed;
+	float forceStrength = 1.f / (m_force.strength * 10000.f);
+
 #pragma omp parallel for
 	for (int i = 0; i < m_numberOfParticles; ++i)
 	{
@@ -60,7 +64,7 @@ void ParticleSystem::update(float dt)
 		
 		if (m_force.isActive)
 		{
-			float forceFactor = (vectorMath::magnitude(m_vertices[i].position - m_force) / (m_force.strength * 10000.f));
+			float forceFactor = vectorMath::magnitude(m_vertices[i].position - m_force) * forceStrength;
 			forceFactor *= forceFactor;
 			forceFactor = 1.f - forceFactor;
 			forceFactor = std::fmax(0.f, forceFactor);
@@ -75,7 +79,7 @@ void ParticleSystem::update(float dt)
 
 		if (m_colorChange)
 		{
-			float colorFac = std::fmax(0.f, 1.0f - vectorMath::magnitude(m_velocity[i]) / maxSpeed);
+			float colorFac = std::fmax(0.f, 1.0f - vectorMath::magnitude(m_velocity[i]) * maxSpeed);
 			m_vertices[i].color = (colorA * colorFac);
 			m_vertices[i].color += (colorB * (1.0f - colorFac));
 		}
