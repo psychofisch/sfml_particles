@@ -36,7 +36,8 @@ void ParticleSystem::setRandomPositions(RNGesus* rng, const vec2& limits)
 	for (size_t i = 0; i < m_numberOfParticles; ++i)
 	{
 		m_position[i] = vec2(rng->GetZeroToOne() * limits.x, rng->GetZeroToOne() * limits.y);
-		m_velocity[i] = vec2(rng->GetZeroToOne() * 10.f - 5.f, rng->GetZeroToOne() * 10.f - 5.f);
+		m_velocity[i] = vec2();
+		//m_velocity[i] = vec2(rng->GetZeroToOne() * 10.f - 5.f, rng->GetZeroToOne() * 10.f - 5.f);
 
 		m_vertices[i] = m_position[i];
 	}
@@ -44,12 +45,11 @@ void ParticleSystem::setRandomPositions(RNGesus* rng, const vec2& limits)
 
 void ParticleSystem::update(float dt)
 {
-	float a = .2f, b = .6f, c = .2f;
-
 #pragma omp parallel for
 	for (int i = 0; i < m_numberOfParticles; ++i)
 	{
 		sf::Vector2f newVel;
+		float maxSpeed = 500.f;
 
 		//m_rng.seed(i * 815, 1337, 420);
 
@@ -58,18 +58,20 @@ void ParticleSystem::update(float dt)
 		
 		if (m_force.isActive)
 		{
-			float forceFactor = 1.f - (vectorMath::magnitude(m_position[i] - m_force) / 200.f);
+			float forceFactor = 1.f - (vectorMath::magnitude(m_position[i] - m_force) / 750.f);
 			forceFactor = std::max(0.f, std::min(1.f, forceFactor));
-			m_velocity[i] += forceFactor * (m_force - m_position[i]) * dt * 50.f;
+			m_velocity[i] += forceFactor * vectorMath::normalize(m_force - m_position[i]) * dt * maxSpeed;
 		}
 
-		m_velocity[i] -= dt * m_velocity[i] * 0.5f;//damping
+		m_velocity[i] -= dt * m_velocity[i] * 0.25f;//damping
 		m_position[i] += m_velocity[i] * dt;
 
 		m_vertices[i].position = m_position[i];
 
-		float colorFac = std::max(0.f, 1.0f - vectorMath::magnitude(m_velocity[i]) / 500.f);
-		m_vertices[i].color.r = static_cast<uint8_t>(colorFac * 255);
+		float colorFac = std::max(0.f, 1.0f - vectorMath::magnitude(m_velocity[i]) / maxSpeed) * 255;
+		sf::Color colorFacColor(colorFac, colorFac, colorFac);
+		sf::Color colorFacColorInverse = sf::Color::White - colorFacColor;
+		m_vertices[i].color = (sf::Color::Black * colorFacColor) + (sf::Color::White * colorFacColorInverse);
 	}
 }
 

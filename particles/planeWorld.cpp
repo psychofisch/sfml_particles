@@ -100,7 +100,7 @@ void planeWorld::run()
 				case sf::Keyboard::H: std::cout << "no one can help you :)" << std::endl;
 					break;
 				case sf::Keyboard::R:
-					particleSwarm->setRandomPositions(m_rng, sf::Vector2f(500.f, 500.f));
+					particleSwarm->setRandomPositions(m_rng, sf::Vector2f(m_dimension.x, m_dimension.y));
 					break;
 				case sf::Keyboard::M:
 					break;
@@ -148,6 +148,11 @@ void planeWorld::run()
 				m_view = sf::View(sf::FloatRect(0, 0, static_cast<float>(eve.size.width), static_cast<float>(eve.size.height)));
 				//sf::Vector2f view_center((m_grid[0].getPosition() + m_grid[m_grid.size() - 1].getPosition()) / 2.0f);
 				m_view.setCenter(sf::Vector2f(0, 0));
+				windowCenter = sf::Vector2f(m_window->getSize());
+				windowCenter /= 2.0f;
+
+				m_uiView.setCenter(windowCenter);
+				m_uiView.setSize(windowCenter * 2.0f);
 			}
 		}
 
@@ -198,7 +203,7 @@ void planeWorld::run()
 		//particleSwarm->drawWithShape(m_window, particle);
 
 		// debug text
-		m_window->setView(m_window->getDefaultView());
+		m_window->setView(m_uiView);
 
 		debugString.str(std::string());//to clean string
 		//int fps = int(1.f / dt);
