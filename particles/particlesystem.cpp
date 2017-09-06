@@ -5,7 +5,8 @@ ParticleSystem::ParticleSystem(size_t numOfParticles)
 	m_force(0, 0, false, 1.f),
 	m_particleSpeed(1.f),
 	m_numberOfParticles(numOfParticles),
-	m_maxSpeed(500.f)
+	m_maxSpeed(500.f),
+	m_colorChange(true)
 {
 	m_position = new vec2[numOfParticles];
 	m_velocity = new vec2[numOfParticles]{ vec2(0, 0) };
@@ -45,12 +46,13 @@ void ParticleSystem::setRandomPositions(RNGesus* rng, const vec2& limits)
 
 void ParticleSystem::update(float dt)
 {
+	float maxSpeed = 500.f;
+	const sf::Color colorA = sf::Color::Yellow;
+	const sf::Color colorB = sf::Color::Red;
+
 #pragma omp parallel for
 	for (int i = 0; i < m_numberOfParticles; ++i)
 	{
-		sf::Vector2f newVel;
-		float maxSpeed = 500.f;
-
 		//m_rng.seed(i * 815, 1337, 420);
 
 		//std::cout << vectorMath::angleD(vectorMath::normalize(newVel) - vectorMath::normalize(m_velocity[i])) << std::endl;
@@ -58,26 +60,43 @@ void ParticleSystem::update(float dt)
 		
 		if (m_force.isActive)
 		{
-			float forceFactor = 1.f - (vectorMath::magnitude(m_position[i] - m_force) / 750.f);
-			forceFactor = std::max(0.f, std::min(1.f, forceFactor));
-			m_velocity[i] += forceFactor * vectorMath::normalize(m_force - m_position[i]) * dt * maxSpeed;
+			float forceFactor = (vectorMath::magnitude(m_vertices[i].position - m_force) / (m_force.strength * 10000.f));
+			forceFactor *= forceFactor;
+			forceFactor = 1.f - forceFactor;
+			forceFactor = std::fmax(0.f, forceFactor);
+			//m_velocity[i] += forceFactor * vectorMath::normalize(m_force - m_vertices[i].position) * dt * maxSpeed * m_force.strength;
+			m_velocity[i] += forceFactor * vectorMath::normalize(m_force - m_vertices[i].position) * dt * m_force.strength;
 		}
 
 		m_velocity[i] -= dt * m_velocity[i] * 0.25f;//damping
-		m_position[i] += m_velocity[i] * dt;
+		m_vertices[i].position += m_velocity[i] * dt;
 
-		m_vertices[i].position = m_position[i];
+		//m_vertices[i].position = m_position[i];
 
-		float colorFac = std::max(0.f, 1.0f - vectorMath::magnitude(m_velocity[i]) / maxSpeed) * 255;
-		sf::Color colorFacColor(colorFac, colorFac, colorFac);
-		sf::Color colorFacColorInverse = sf::Color::White - colorFacColor;
-		m_vertices[i].color = (sf::Color::Black * colorFacColor) + (sf::Color::White * colorFacColorInverse);
+		if (m_colorChange)
+		{
+			float colorFac = std::fmax(0.f, 1.0f - vectorMath::magnitude(m_velocity[i]) / maxSpeed);
+			m_vertices[i].color = (colorA * colorFac);
+			m_vertices[i].color += (colorB * (1.0f - colorFac));
+		}
+		else
+			m_vertices[i].color = sf::Color::Green;
 	}
 }
 
 void ParticleSystem::setForceActive(bool b)
 {
 	m_force.isActive = b;
+}
+
+void ParticleSystem::setForceStrength(float s)
+{
+	m_force.strength = s;
+}
+
+void ParticleSystem::activateColor(bool b)
+{
+	m_colorChange = b;
 }
 
 void ParticleSystem::draw(sf::RenderTarget & target, sf::RenderStates states) const
@@ -105,4 +124,9 @@ Force & Force::operator=(const vec2 & v)
 	this->x = v.x;
 	this->y = v.y;
 	return *this;
+}
+
+sf::Color operator*(const sf::Color & left, const float f)
+{
+	return sf::Color(left.r * f, left.g * f, left.b * f, left.a * f);
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <SFML\Graphics.hpp>
 
 #define PI_INVERSE 0.318309886183790671537767526745028724f
@@ -26,6 +27,7 @@ namespace sf {
 namespace vectorMath {
 	sf::Vector2f normalize(const sf::Vector2f&);
 	float magnitude(const sf::Vector2f&);
+	float magnitudeFast(const sf::Vector2f&);
 	float max(const sf::Vector2f& vec);
 	sf::Vector2f multiply(const sf::Vector2f& left, const sf::Vector2f& right);
 	float dot(const sf::Vector2f& left, const sf::Vector2f& right);
@@ -48,4 +50,5 @@ namespace vectorMath {
 	float sign(sf::Vector2f point, sf::Vector2f p1, sf::Vector2f p2);
 	bool pointInTriangle(sf::Vector2f point, sf::Vector2f t1, sf::Vector2f t2, sf::Vector2f t3);
 	sf::Vector2f projectPointOnLine(sf::Vector2f l1, sf::Vector2f l2, sf::Vector2f p);
+	float fastsqrt(const float f);
 }

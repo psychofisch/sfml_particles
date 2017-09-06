@@ -39,13 +39,16 @@ void planeWorld::run()
 	std::stringstream debugString;
 	//***d
 
-	int numberOfParticles = 100;
+	int numberOfParticles = 10000;
 	ParticleSystem* particleSwarm = new ParticleSystem(numberOfParticles);
 	particleSwarm->setRandomPositions(m_rng, sf::Vector2f(m_dimension.x, m_dimension.y));
 
 	sf::CircleShape particle;
 	particle.setRadius(5.f);
 	particle.setFillColor(sf::Color::Green);
+
+	bool particleColor = true;
+	float forceStrength = 1000.f;
 
 	unsigned int fps = 0, fpsCount = 0;
 	float fpsTimer = 0.f;
@@ -67,18 +70,18 @@ void planeWorld::run()
 				quit = true;
 				break;
 			}
-			else if (eve.type == sf::Event::MouseButtonPressed && eve.mouseButton.button == sf::Mouse::Left)
+			else if (eve.type == sf::Event::MouseButtonPressed && (eve.mouseButton.button == sf::Mouse::Left || eve.mouseButton.button == sf::Mouse::Right))
 			{
 				particleSwarm->setForceActive(true);
+				if(eve.mouseButton.button == sf::Mouse::Left)
+					particleSwarm->setForceStrength(forceStrength);
+				else
+					particleSwarm->setForceStrength(-forceStrength);
 				break;
 			}
-			else if (eve.type == sf::Event::MouseButtonReleased && eve.mouseButton.button == sf::Mouse::Left)
+			else if (eve.type == sf::Event::MouseButtonReleased && (eve.mouseButton.button == sf::Mouse::Left || eve.mouseButton.button == sf::Mouse::Right))
 			{
 				particleSwarm->setForceActive(false);
-				break;
-			}
-			else if (eve.type == sf::Event::MouseButtonPressed && eve.mouseButton.button == sf::Mouse::Right)
-			{
 				break;
 			}
 			else if (eve.type == sf::Event::MouseWheelScrolled)
@@ -102,7 +105,9 @@ void planeWorld::run()
 				case sf::Keyboard::R:
 					particleSwarm->setRandomPositions(m_rng, sf::Vector2f(m_dimension.x, m_dimension.y));
 					break;
-				case sf::Keyboard::M:
+				case sf::Keyboard::C:
+					particleColor = !particleColor;
+					particleSwarm->activateColor(particleColor);
 					break;
 				case sf::Keyboard::V:
 					if (m_vsync)

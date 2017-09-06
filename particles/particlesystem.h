@@ -9,6 +9,8 @@
 
 typedef sf::Vector2f vec2;
 
+sf::Color operator*(const sf::Color& left, const float f);
+
 class Force : public vec2
 {
 public:
@@ -30,11 +32,14 @@ public:
 	void setRandomPositions(RNGesus* rng, const vec2& limits);
 	void update(float dt);
 	void setForceActive(bool b);
+	void setForceStrength(float s);
+	void activateColor(bool b);
 
 private:
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+	bool m_colorChange;
 	size_t m_numberOfParticles;
 	float m_particleSpeed, m_maxSpeed;
 	Force m_force;

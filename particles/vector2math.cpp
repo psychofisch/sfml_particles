@@ -15,7 +15,16 @@ float vectorMath::magnitude(const sf::Vector2f& source)
 {
 	if (source.x == 0.f && source.y == 0.f)
 		return 0.f;
+	
 	return sqrtf((source.x * source.x) + (source.y * source.y));
+}
+
+float vectorMath::magnitudeFast(const sf::Vector2f &source)
+{
+	if (source.x == 0.f && source.y == 0.f)
+		return 0.f;
+
+	return fastsqrt((source.x * source.x) + (source.y * source.y));
 }
 
 float vectorMath::max(const sf::Vector2f & vec)
@@ -188,4 +197,15 @@ sf::Vector2f vectorMath::projectPointOnLine(sf::Vector2f l1, sf::Vector2f l2, sf
 	float y = (m * m * p.y + m * p.x + b) / tmp;
 
 	return sf::Vector2f(x, y);
+}
+
+float vectorMath::fastsqrt(const float f)
+{
+	int val_int = *(int*)&f;
+
+	val_int -= 1 << 23; /* Subtract 2^m. */
+	val_int >>= 1; /* Divide by 2. */
+	val_int += 1 << 29; /* Add ((b + 1) / 2) * 2^m. */
+
+	return *(float*)&val_int; /* Interpret again as float */
 }
