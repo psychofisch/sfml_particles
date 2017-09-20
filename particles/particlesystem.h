@@ -7,15 +7,16 @@
 #include "vector2math.h"
 #include "RNGesus.h"
 
-typedef sf::Vector2f vec2;
+typedef sf::Vector2f vec2f;
+typedef sf::Vector2u vec2u;
 
 sf::Color operator*(const sf::Color& left, const float f);
 
-class Force : public vec2
+class Force : public vec2f
 {
 public:
 	Force(float x, float y, bool active, float strength);
-	Force &operator=(const vec2& v);
+	Force &operator=(const vec2f& v);
 
 	bool isActive;
 	float strength;
@@ -24,12 +25,12 @@ public:
 class ParticleSystem : public sf::Drawable, public sf::Transformable
 {
 public:
-	ParticleSystem(size_t numOfParticles);
+	ParticleSystem(size_t numOfParticles, vec2u dimension);
 	~ParticleSystem();
 
-	void setForcePosition(vec2 p);
+	void setForcePosition(vec2f p);
 	void drawWithShape(sf::RenderWindow* window, sf::CircleShape& shape);
-	void setRandomPositions(RNGesus* rng, const vec2& limits);
+	void setRandomPositions(RNGesus* rng);
 	void update(float dt);
 	void setForceActive(bool b);
 	void setForceStrength(float s);
@@ -42,10 +43,12 @@ private:
 	bool m_colorChange;
 	size_t m_numberOfParticles;
 	float m_particleSpeed, m_maxSpeed;
+	vec2u m_dimension;
 	Force m_force;
 	RNGesus m_rng;
-	vec2* m_position;
-	vec2* m_velocity;
+	vec2f* m_position;
+	vec2f* m_velocity;
+	float* m_randoms;
 	sf::VertexArray m_vertices;
 };
 

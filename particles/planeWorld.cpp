@@ -39,16 +39,21 @@ void planeWorld::run()
 	std::stringstream debugString;
 	//***d
 
+	sf::RectangleShape particleWorldRect;
+	particleWorldRect.setSize(vec2f(m_dimension));
+	particleWorldRect.setFillColor(sf::Color(69, 69, 69));
+
 	int numberOfParticles = 10000;
-	ParticleSystem* particleSwarm = new ParticleSystem(numberOfParticles);
-	particleSwarm->setRandomPositions(m_rng, sf::Vector2f(m_dimension.x, m_dimension.y));
+	ParticleSystem* particleSwarm = new ParticleSystem(numberOfParticles, m_dimension);
+	particleSwarm->setRandomPositions(m_rng);
 
 	sf::CircleShape particle;
 	particle.setRadius(5.f);
 	particle.setFillColor(sf::Color::Green);
 
-	bool particleColor = true;
-	float forceStrength = 1000.f;
+	bool particleColor = false;
+	particleSwarm->activateColor(particleColor);
+	float forceStrength = 50.f;
 
 	unsigned int fps = 0, fpsCount = 0;
 	float fpsTimer = 0.f;
@@ -103,7 +108,7 @@ void planeWorld::run()
 				case sf::Keyboard::H: std::cout << "no one can help you :)" << std::endl;
 					break;
 				case sf::Keyboard::R:
-					particleSwarm->setRandomPositions(m_rng, sf::Vector2f(m_dimension.x, m_dimension.y));
+					particleSwarm->setRandomPositions(m_rng);
 					break;
 				case sf::Keyboard::C:
 					particleColor = !particleColor;
@@ -130,14 +135,14 @@ void planeWorld::run()
 				case sf::Keyboard::Q:
 					numberOfParticles /= 10;
 					delete particleSwarm;
-					particleSwarm = new ParticleSystem(numberOfParticles);
-					particleSwarm->setRandomPositions(m_rng, sf::Vector2f(m_dimension.x, m_dimension.y));
+					particleSwarm = new ParticleSystem(numberOfParticles, m_dimension);
+					particleSwarm->setRandomPositions(m_rng);
 					break;
 				case sf::Keyboard::E:
 					numberOfParticles *= 10;
 					delete particleSwarm;
-					particleSwarm = new ParticleSystem(numberOfParticles);
-					particleSwarm->setRandomPositions(m_rng, sf::Vector2f(m_dimension.x, m_dimension.y));
+					particleSwarm = new ParticleSystem(numberOfParticles, m_dimension);
+					particleSwarm->setRandomPositions(m_rng);
 					break;
 				case sf::Keyboard::U:
 					break;
@@ -200,10 +205,11 @@ void planeWorld::run()
 		}
 
 		//render
-		m_window->clear(sf::Color(69, 69, 69));
+		m_window->clear(sf::Color(96, 96, 96));
 
 		m_window->setView(m_view);
 
+		m_window->draw(particleWorldRect);
 		m_window->draw(*particleSwarm);
 		//particleSwarm->drawWithShape(m_window, particle);
 
