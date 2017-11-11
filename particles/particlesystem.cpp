@@ -11,6 +11,7 @@ ParticleSystem::ParticleSystem(size_t numOfParticles, vec2u dimension)
 {
 	m_position = new vec2f[numOfParticles];
 	m_velocity = new vec2f[numOfParticles]{ vec2f(0, 0) };
+	m_pressure = new vec2f[numOfParticles]{ vec2f(0, 0) };
 	m_randoms = new float[numOfParticles];
 
 	for (int i = 0; i < numOfParticles; ++i)
@@ -44,7 +45,7 @@ void ParticleSystem::setRandomPositions(RNGesus* rng)
 {
 	for (size_t i = 0; i < m_numberOfParticles; ++i)
 	{
-		m_position[i] = vec2f(rng->GetZeroToOne() * m_dimension.x, rng->GetZeroToOne() * m_dimension.y);
+		m_position[i] = vec2f(rng->GetZeroToOne() * m_dimension.x * 0.5, rng->GetZeroToOne() * m_dimension.y);
 		m_velocity[i] = vec2f();
 		//m_velocity[i] = vec2(rng->GetZeroToOne() * 10.f - 5.f, rng->GetZeroToOne() * 10.f - 5.f);
 
@@ -67,6 +68,7 @@ void ParticleSystem::update(float dt)
 	{
 		vec2f particlePosition = m_vertices[i].position;
 		vec2f particleVelocity = m_velocity[i];
+		vec2f particlePressure = calculatePressureVector(i);
 		float r = m_randoms[i];
 		//m_rng.seed(i * 815, 1337, 420);
 
@@ -96,13 +98,18 @@ void ParticleSystem::update(float dt)
 		//gravity
 		if(particlePosition.y < m_dimension.y)
 			particleVelocity.y += 9.81f * dt;
+
+		if(sf::FloatRect(0,0,m_dimension.x, m_dimension.y).contains(particlePosition))
+			particleVelocity += particlePressure * dt;
 		//***g
 
 		particleVelocity -= dt * particleVelocity * 0.25f;//damping
 		particlePosition += particleVelocity /** dt*/;
 
-		m_vertices[i].position = particlePosition;
+		m_position[i] = particlePosition;
 		m_velocity[i] = particleVelocity;
+
+		m_vertices[i].position = particlePosition;
 
 		if (m_colorChange)
 		{
@@ -128,6 +135,27 @@ void ParticleSystem::setForceStrength(float s)
 void ParticleSystem::activateColor(bool b)
 {
 	m_colorChange = b;
+}
+
+vec2f ParticleSystem::calculatePressureVector(size_t index)
+{
+	float smoothingWidth = 10.f;
+	float amplitude = 50.f;
+
+	vec2f pressureVec;
+	for (int i = 0; i < m_numberOfParticles; ++i)
+	{
+		if (index == i)
+			continue;
+
+		vec2f particlePosition = m_position[i];
+		vec2f dirVec = m_position[index] - particlePosition;
+		float dist = vectorMath::magnitudeFast(dirVec);
+
+		float pressure = amplitude * expf(-powf(dist/smoothingWidth, 2));
+		pressureVec += pressure * vectorMath::normalize(dirVec);
+	}
+	return pressureVec;
 }
 
 void ParticleSystem::draw(sf::RenderTarget & target, sf::RenderStates states) const

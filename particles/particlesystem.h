@@ -35,6 +35,7 @@ public:
 	void setForceActive(bool b);
 	void setForceStrength(float s);
 	void activateColor(bool b);
+	vec2f calculatePressureVector(size_t index);
 
 private:
 
@@ -42,12 +43,13 @@ private:
 
 	bool m_colorChange;
 	size_t m_numberOfParticles;
-	float m_particleSpeed, m_maxSpeed;
+	float m_particleSpeed, m_maxSpeed, m_particleRadius;
 	vec2u m_dimension;
 	Force m_force;
 	RNGesus m_rng;
 	vec2f* m_position;
 	vec2f* m_velocity;
+	vec2f* m_pressure;
 	float* m_randoms;
 	sf::VertexArray m_vertices;
 };

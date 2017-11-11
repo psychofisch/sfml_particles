@@ -7,7 +7,7 @@
 #define INVERSE_180 0.0055555555555555555555f
 
 namespace sf {
-	const float PI = 3.1415f;
+	const float PI = 3.14159265f;
 
 	struct Vector2fLines {
 		sf::Vector2f p1;

@@ -43,7 +43,7 @@ void planeWorld::run()
 	particleWorldRect.setSize(vec2f(m_dimension));
 	particleWorldRect.setFillColor(sf::Color(69, 69, 69));
 
-	int numberOfParticles = 10000;
+	int numberOfParticles = 100;
 	ParticleSystem* particleSwarm = new ParticleSystem(numberOfParticles, m_dimension);
 	particleSwarm->setRandomPositions(m_rng);
 
