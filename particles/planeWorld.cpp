@@ -53,7 +53,7 @@ void planeWorld::run()
 
 	bool particleColor = false;
 	particleSwarm->activateColor(particleColor);
-	float forceStrength = 50.f;
+	float forceStrength = 20.f;
 
 	unsigned int fps = 0, fpsCount = 0;
 	float fpsTimer = 0.f;
@@ -133,13 +133,13 @@ void planeWorld::run()
 				case sf::Keyboard::Dash:
 					break;
 				case sf::Keyboard::Q:
-					numberOfParticles /= 10;
+					numberOfParticles -= 1000;
 					delete particleSwarm;
 					particleSwarm = new ParticleSystem(numberOfParticles, m_dimension);
 					particleSwarm->setRandomPositions(m_rng);
 					break;
 				case sf::Keyboard::E:
-					numberOfParticles *= 10;
+					numberOfParticles += 1000;
 					delete particleSwarm;
 					particleSwarm = new ParticleSystem(numberOfParticles, m_dimension);
 					particleSwarm->setRandomPositions(m_rng);

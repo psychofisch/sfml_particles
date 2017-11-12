@@ -89,10 +89,10 @@ void ParticleSystem::update(float dt)
 
 		//static collision
 		if ((particlePosition.x > m_dimension.x && particleVelocity.x > 0.f) || (particlePosition.x < 0.f && particleVelocity.x < 0.f))
-			particleVelocity.x *= -(.5f + 0.2f * r);
+			particleVelocity.x *= -(.1f + 0.2f * r);
 
 		if ((particlePosition.y > m_dimension.x && particleVelocity.y > 0.f) || (particlePosition.y < 0.f && particleVelocity.y < 0.f))
-			particleVelocity.y *= -(.5f + 0.2f * r);
+			particleVelocity.y *= -(.1f + 0.2f * r);
 		//*** sc
 
 		//gravity
@@ -139,8 +139,8 @@ void ParticleSystem::activateColor(bool b)
 
 vec2f ParticleSystem::calculatePressureVector(size_t index)
 {
-	float smoothingWidth = 10.f;
-	float amplitude = 50.f;
+	float smoothingWidth = 100.f;
+	float amplitude = 1.f;
 
 	vec2f pressureVec;
 	for (int i = 0; i < m_numberOfParticles; ++i)
@@ -152,8 +152,13 @@ vec2f ParticleSystem::calculatePressureVector(size_t index)
 		vec2f dirVec = m_position[index] - particlePosition;
 		float dist = vectorMath::magnitudeFast(dirVec);
 
-		float pressure = amplitude * expf(-powf(dist/smoothingWidth, 2));
-		pressureVec += pressure * vectorMath::normalize(dirVec);
+		if (dist > smoothingWidth * 1.f)
+			continue;
+
+		//float pressure = 1.f - (dist/smoothingWidth);
+		float pressure = amplitude * expf(-powf(dist, 2)/smoothingWidth);
+		//pressureVec += pressure * vectorMath::normalize(dirVec);
+		pressureVec += pressure * dirVec;
 	}
 	return pressureVec;
 }
